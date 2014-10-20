@@ -18,7 +18,6 @@ namespace ADCmd
         public string ServicePassword { get; set; }
         public string ContractorsOU { get; set; }
 
-
         public ADDomain()
         {
             LDAPPath =  ConfigurationManager.AppSettings["ldap_path"];

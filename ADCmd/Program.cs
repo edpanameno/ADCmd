@@ -17,7 +17,8 @@ namespace ADCmd
 
             foreach(var user in users)
             {
-                Console.WriteLine(user.SamAccountName + " -> Company: " + user.Company);
+                Console.WriteLine(user);
+                //Console.WriteLine("Name: " + user.Surname + " " + user.GivenName + " => Company: " + user.Company + " Department: " + user.Department);
             }
 
             Console.WriteLine("Results found: " + users.Count);

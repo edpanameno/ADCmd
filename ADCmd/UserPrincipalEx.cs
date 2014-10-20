@@ -20,7 +20,7 @@ namespace ADCmd
             {
                 if(ExtensionGet("company").Length != 1)
                 {
-                    return string.Empty;
+                    return "No Company";
                 }
                 else
                 {
@@ -84,7 +84,7 @@ namespace ADCmd
             {
                 if(ExtensionGet("telephoneNumber").Length != 1)
                 {
-                    return string.Empty;
+                    return "No Phone Number";
                 }
                 else
                 {
@@ -96,5 +96,15 @@ namespace ADCmd
             {
                 ExtensionSet("telephoneNumber", value);
             }
+        }
+
+        public override string ToString()
+        {
+            return "Username: " + this.SamAccountName + "\n" +
+                   "First Name: " + this.GivenName + "\n" +
+                   "Last Name: " + this.Surname + "\n" +
+                   "Department: " + this.Department + "\n" +
+                   "Telephone: " + this.PhoneNumber + "\n" +
+                   "Company: " + this.Company + "\n";
         }    }
 }
