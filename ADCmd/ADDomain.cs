@@ -29,9 +29,9 @@ namespace ADCmd
             ServicePassword = ConfigurationManager.AppSettings["service_password"];
         }
 
-        public List<UserPrincipal> GetAllContractors()
+        public List<UserPrincipalEx> GetAllContractors()
         {
-            List<UserPrincipal> activeUsers = new List<UserPrincipal>();
+            List<UserPrincipalEx> activeUsers = new List<UserPrincipalEx>();
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
                                                             ServerName, 
                                                             ContractorsOU, 
@@ -39,7 +39,7 @@ namespace ADCmd
                                                             ServiceUser, 
                                                             ServicePassword);
 
-            UserPrincipal userPrincipal = new UserPrincipal(context)
+            UserPrincipalEx userPrincipal = new UserPrincipalEx(context)
             {
                 // We are only interested in searching for active directory 
                 // accounts that are enabled.
@@ -51,7 +51,7 @@ namespace ADCmd
             ((DirectorySearcher)searcher.GetUnderlyingSearcher()).PageSize = 1000;
             var searchResults = searcher.FindAll().ToList();
 
-            foreach(UserPrincipal user in searchResults) 
+            foreach(UserPrincipalEx user in searchResults) 
             {
                 activeUsers.Add(user);
             }

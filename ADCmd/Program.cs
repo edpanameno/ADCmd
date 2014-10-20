@@ -13,11 +13,11 @@ namespace ADCmd
         static void Main(string[] args)
         {
             ADDomain domain = new ADDomain();
-            List<UserPrincipal> users = domain.GetAllContractors();
+            List<UserPrincipalEx> users = domain.GetAllContractors();
 
             foreach(var user in users)
             {
-                Console.WriteLine(user.SamAccountName + " -> " + user.GivenName + " " + user.Surname);
+                Console.WriteLine(user.SamAccountName + " -> Company: " + user.Company);
             }
 
             Console.WriteLine("Results found: " + users.Count);
