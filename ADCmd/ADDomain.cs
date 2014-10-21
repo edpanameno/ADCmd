@@ -38,24 +38,28 @@ namespace ADCmd
                                                             ServiceUser, 
                                                             ServicePassword);
 
-            UserPrincipalEx userPrincipal = new UserPrincipalEx(context)
+            // We are only interested in searching for active directory 
+            // accounts that are enabled.
+            UserPrincipalEx userFilter = new UserPrincipalEx(context)
             {
-                // We are only interested in searching for active directory 
-                // accounts that are enabled.
-                Enabled = true
+                Enabled = true 
             };
 
-            PrincipalSearcher searcher = new PrincipalSearcher();
-            searcher.QueryFilter = userPrincipal;
-            ((DirectorySearcher)searcher.GetUnderlyingSearcher()).PageSize = 1000;
-            var searchResults = searcher.FindAll().ToList();
-
-            foreach(UserPrincipalEx user in searchResults) 
+            using(PrincipalSearcher searcher = new PrincipalSearcher(userFilter))
             {
-                activeUsers.Add(user);
+                ((DirectorySearcher)searcher.GetUnderlyingSearcher()).PageSize = 1000;
+                var searchResults = searcher.FindAll().ToList();
+
+                foreach(Principal user in searchResults) 
+                {
+                    // This will allow us to get to the custom attributes that we 
+                    // have defined in our custom UserPrincipal object
+                    UserPrincipalEx usr = user as UserPrincipalEx;
+                    activeUsers.Add(usr);
+                }
             }
 
-            return activeUsers;
+            return activeUsers.OrderBy(u => u.Surname).ToList();
         }
     }
 }

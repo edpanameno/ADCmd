@@ -20,7 +20,7 @@ namespace ADCmd
             {
                 if(ExtensionGet("company").Length != 1)
                 {
-                    return "No Company";
+                    return string.Empty;
                 }
                 else
                 {
@@ -79,12 +79,11 @@ namespace ADCmd
         [DirectoryProperty("telephoneNumber")]
         public string PhoneNumber
         {
-
             get
             {
                 if(ExtensionGet("telephoneNumber").Length != 1)
                 {
-                    return "No Phone Number";
+                    return "No Telephone";
                 }
                 else
                 {
