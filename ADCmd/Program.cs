@@ -15,7 +15,6 @@ namespace ADCmd
         {
             var options = new ProgramOptions();
 
-            string ouContainer = string.Empty;
             var p = new OptionSet()
             {
                 {"ou|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
