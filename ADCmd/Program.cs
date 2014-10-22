@@ -13,33 +13,31 @@ namespace ADCmd
     {
         static void Main(string[] args)
         {
-            /*ADDomain domain = new ADDomain();
-            List<UserPrincipalEx> users = domain.GetAllContractors();
-
-            foreach(var user in users)
-            {
-                Console.WriteLine(user);
-            }
-
-            Console.WriteLine("Results found: " + users.Count);*/
             var options = new ProgramOptions();
 
             string ouContainer = string.Empty;
             var p = new OptionSet()
             {
-                {"o", a => options.OU = a}
-            };
-
-            p.Parse(args);
-
-            //p.WriteOptionDescriptions(Console.Out);
+                {"ou|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
+                {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true }
+            }.Parse(args);
 
             if(options.OU != null)
             {
-                Console.WriteLine("OU: " + options.OU);
+                Console.WriteLine("value of ou: " + options.OU);
             }
 
-            //Console.ReadLine();
+            if(options.GetContractors)
+            {
+                ADDomain domain = new ADDomain();
+                List<UserPrincipalEx> users = domain.GetAllContractors();
+
+                foreach(var user in users)
+                {
+                  
+                 Console.WriteLine(user);
+                }
+            }
         }
     }
 
@@ -50,5 +48,6 @@ namespace ADCmd
     public class ProgramOptions
     {
         public string OU { get; set; }
+        public bool GetContractors { get; set; }
     }
 }
