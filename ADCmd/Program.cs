@@ -13,13 +13,17 @@ namespace ADCmd
     {
         static void Main(string[] args)
         {
+            ADDomain domain = new ADDomain();
             var options = new ProgramOptions();
 
             var p = new OptionSet()
             {
                 {"ou|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
-                {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true }
-            }.Parse(args);
+                {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true },
+                {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true}
+            };
+            
+            List<string> temp = p.Parse(args);
 
             if(options.OU != null)
             {
@@ -28,13 +32,22 @@ namespace ADCmd
 
             if(options.GetContractors)
             {
-                ADDomain domain = new ADDomain();
                 List<UserPrincipalEx> users = domain.GetAllContractors();
 
                 foreach(var user in users)
                 {
-                  
-                 Console.WriteLine(user);
+                    Console.WriteLine(user);
+                }
+            }
+
+            if(options.GetDisabledUsers)
+            {
+                Console.WriteLine("Inside of getdisabledusers");
+                List<UserPrincipalEx> disabledUsers = domain.GetDisabledUsers();
+                
+                foreach(var user in disabledUsers)
+                {
+                    Console.WriteLine(user);
                 }
             }
         }
@@ -48,5 +61,6 @@ namespace ADCmd
     {
         public string OU { get; set; }
         public bool GetContractors { get; set; }
+        public bool GetDisabledUsers { get; set; }
     }
 }

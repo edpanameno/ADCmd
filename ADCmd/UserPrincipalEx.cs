@@ -83,7 +83,7 @@ namespace ADCmd
             {
                 if(ExtensionGet("telephoneNumber").Length != 1)
                 {
-                    return "No Telephone";
+                    return string.Empty;
                 }
                 else
                 {

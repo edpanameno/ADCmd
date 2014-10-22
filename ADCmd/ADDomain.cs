@@ -61,5 +61,39 @@ namespace ADCmd
 
             return activeUsers.OrderBy(u => u.Surname).ToList();
         }
+        
+        public List<UserPrincipalEx> GetDisabledUsers()
+        {
+            List<UserPrincipalEx> activeUsers = new List<UserPrincipalEx>();
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
+                                                            ServerName, 
+                                                            Container, 
+                                                            ContextOptions.Negotiate, 
+                                                            ServiceUser, 
+                                                            ServicePassword);
+
+            // We are only interested in searching for active directory 
+            // accounts that are disabled.
+            UserPrincipalEx userFilter = new UserPrincipalEx(context)
+            {
+                Enabled = false 
+            };
+
+            using(PrincipalSearcher searcher = new PrincipalSearcher(userFilter))
+            {
+                ((DirectorySearcher)searcher.GetUnderlyingSearcher()).PageSize = 1000;
+                var searchResults = searcher.FindAll().ToList();
+
+                foreach(Principal user in searchResults) 
+                {
+                    // This will allow us to get to the custom attributes that we 
+                    // have defined in our custom UserPrincipal object
+                    UserPrincipalEx usr = user as UserPrincipalEx;
+                    activeUsers.Add(usr);
+                }
+            }
+
+            return activeUsers.OrderBy(u => u.Surname).ToList();
+        }
     }
 }
