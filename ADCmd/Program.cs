@@ -27,7 +27,19 @@ namespace ADCmd
 
             if(options.OU != null)
             {
-                Console.WriteLine("value of ou: " + options.OU);
+                if(!domain.IsValidOU(options.OU))
+                {
+                    Console.WriteLine(options.OU + " is not a valid OU DN.");
+                }
+                else
+                {
+                    List<UserPrincipalEx> users = domain.GetUsersFromOU(options.OU);
+                    
+                    foreach(var user in users)
+                    {
+                        Console.WriteLine(user);
+                    }
+                }
             }
 
             if(options.GetContractors)

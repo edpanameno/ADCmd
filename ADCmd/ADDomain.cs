@@ -95,5 +95,73 @@ namespace ADCmd
 
             return activeUsers.OrderBy(u => u.Surname).ToList();
         }
+
+        /// <summary>
+        /// Gets all of the users from the specified OU. The ou va
+        /// </summary>
+        /// <param name="ou"></param>
+        /// <returns></returns>
+        public List<UserPrincipalEx> GetUsersFromOU(string ouDN)
+        {
+            List<UserPrincipalEx> users = new List<UserPrincipalEx>();
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
+                                                            ServerName, 
+                                                            ouDN, 
+                                                            ContextOptions.Negotiate, 
+                                                            ServiceUser, 
+                                                            ServicePassword);
+
+            UserPrincipalEx userFilter = new UserPrincipalEx(context)
+            {
+                //Enabled = false
+            };
+
+            using(PrincipalSearcher searcher = new PrincipalSearcher(userFilter))
+            {
+                ((DirectorySearcher)searcher.GetUnderlyingSearcher()).PageSize = 1000;
+                var searchResults = searcher.FindAll().ToList();
+
+                foreach(Principal user in searchResults) 
+                {
+                    // This will allow us to get to the custom attributes that we 
+                    // have defined in our custom UserPrincipal object
+                    UserPrincipalEx usr = user as UserPrincipalEx;
+                    users.Add(usr);
+                }
+            }
+
+            return users.OrderBy(u => u.Surname).ToList();
+        }
+
+        /// <summary>
+        /// Checks to see if the OU DN is a valid one.
+        /// </summary>
+        /// <param name="ou"></param>
+        /// <returns>True is OU exists, false otherwise.</returns>
+        public bool IsValidOU(string ouDistinguishedName)
+        {
+            bool result = true;
+            PrincipalContext context = null;
+
+            try
+            {
+                context = new PrincipalContext(ContextType.Domain, 
+                                               ServerName, 
+                                               ouDistinguishedName, 
+                                               ContextOptions.Negotiate, 
+                                               ServiceUser, 
+                                               ServicePassword);
+            }
+            catch(Exception e)
+            {
+                result = false;
+            }
+            finally
+            {
+                context.Dispose();
+            }
+
+            return result;
+        }
     }
 }
