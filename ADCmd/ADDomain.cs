@@ -9,6 +9,19 @@ using System.Threading.Tasks;
 
 namespace ADCmd
 {
+    /// <summary>
+    /// Specifies what AD Property will be used to search
+    /// objects in active directory.
+    /// </summary>
+    public enum SearchProperty 
+    {
+        FirstName = 1,
+        LastName,
+        Email,
+        Department,
+        Company
+    }
+
     public class ADDomain
     {
         public string ServerName { get; set; }
@@ -113,7 +126,7 @@ namespace ADCmd
 
             UserPrincipalEx userFilter = new UserPrincipalEx(context)
             {
-                //Enabled = false
+                Department = "*Pasa*"
             };
 
             using(PrincipalSearcher searcher = new PrincipalSearcher(userFilter))

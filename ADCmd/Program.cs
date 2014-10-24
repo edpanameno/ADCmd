@@ -25,6 +25,7 @@ namespace ADCmd
             
             List<string> temp = p.Parse(args);
 
+
             if(options.OU != null)
             {
                 if(!domain.IsValidOU(options.OU))
@@ -60,6 +61,15 @@ namespace ADCmd
                 foreach(var user in disabledUsers)
                 {
                     Console.WriteLine(user);
+                }
+            }
+            
+            if(temp != null)
+            {
+                foreach(var t in temp)
+                {
+                    Console.WriteLine("I am looping!");
+                    Console.WriteLine(t);
                 }
             }
         }
