@@ -23,9 +23,9 @@ namespace ADCmd
                 {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true}
             };
             
-            List<string> temp = p.Parse(args);
-
-
+            List<string> temp;
+            temp = p.Parse(args);
+            
             if(options.OU != null)
             {
                 if(!domain.IsValidOU(options.OU))
