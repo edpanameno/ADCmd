@@ -41,7 +41,12 @@ namespace ADCmd
             ServicePassword = ConfigurationManager.AppSettings["service_password"];
         }
 
-        public List<UserPrincipalEx> GetAllContractors()
+        /// <summary>
+        /// Gets a list of users from the Organizational Unit that has been specified
+        /// as the default OU in the app.config file.
+        /// </summary>
+        /// <returns></returns>
+        public List<UserPrincipalEx> GetUsersFromDefaultOU()
         {
             List<UserPrincipalEx> activeUsers = new List<UserPrincipalEx>();
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
@@ -74,7 +79,11 @@ namespace ADCmd
 
             return activeUsers.OrderBy(u => u.Surname).ToList();
         }
-        
+       
+        /// <summary>
+        /// Gets a list of users who are disabled
+        /// </summary>
+        /// <returns></returns>
         public List<UserPrincipalEx> GetDisabledUsers()
         {
             List<UserPrincipalEx> activeUsers = new List<UserPrincipalEx>();

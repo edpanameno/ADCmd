@@ -46,8 +46,8 @@ namespace ADCmd
 
             if(options.GetContractors)
             {
-                List<UserPrincipalEx> users = domain.GetAllContractors();
-
+                List<UserPrincipalEx> users = domain.GetUsersFromOU(domain.DefaultOU);
+                
                 foreach(var user in users)
                 {
                     Console.WriteLine(user);
@@ -56,7 +56,7 @@ namespace ADCmd
 
             if(options.GetDefaultOU)
             {
-                List<UserPrincipalEx> users = domain.GetUsersFromOU(domain.DefaultOU);
+                List<UserPrincipalEx> users = domain.GetUsersFromDefaultOU();
                 
                 foreach(var user in users)
                 {
@@ -95,7 +95,6 @@ namespace ADCmd
         public string OU { get; set; }
         public bool GetContractors { get; set; }
         public bool GetDisabledUsers { get; set; }
-        public bool GetDefaultOU { get; set; 
-}
+        public bool GetDefaultOU { get; set; }
     }
 }
