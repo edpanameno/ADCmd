@@ -18,71 +18,47 @@ namespace ADCmd
 
             var p = new OptionSet()
             {
-                {"ou|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
+                {"o|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
                 {"dou|defaultOU=", "Get Users from the Organization Unit", a => options.GetDefaultOU = true},
                 {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true },
-                {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true}
-            };
+                {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true},
+                {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true}
+            }.Parse(args);
             
-            List<string> temp;
-            temp = p.Parse(args);
+            //List<string> temp = p.Parse(args);
             
-            if(options.OU != null)
+            if(!String.IsNullOrEmpty(options.OU))
             {
-                if(!domain.IsValidOU(options.OU))
+                //Console.WriteLine("OU: " + options.OU);
+                string ou = options.OU.Substring(1, options.OU.Length - 1);
+                Console.WriteLine("OU: " + ou);
+                bool exportUsers = options.ExportUsers;
+                List<UserPrincipalEx> users = domain.GetUsersFromOU(ou, exportUsers);
+
+                foreach(var u in users)
                 {
-                    Console.WriteLine(options.OU + " is not a valid OU DN.");
+                    Console.WriteLine(u);
+                }
+
+                /*if(options.ExportUsers)
+                {
+                    Console.WriteLine("This will be epxorted");
                 }
                 else
                 {
-                    List<UserPrincipalEx> users = domain.GetUsersFromOU(options.OU);
-                    
-                    foreach(var user in users)
-                    {
-                        Console.WriteLine(user);
-                    }
+                    Console.WriteLine("This will not be exported");
                 }
-            }
 
-            if(options.GetContractors)
-            {
-                List<UserPrincipalEx> users = domain.GetUsersFromOU(domain.DefaultOU);
-                
-                foreach(var user in users)
+                if(options.GetDisabledUsers)
                 {
-                    Console.WriteLine(user);
+                    Console.WriteLine("Get disabled users too");
                 }
-            }
-
-            if(options.GetDefaultOU)
-            {
-                List<UserPrincipalEx> users = domain.GetUsersFromDefaultOU();
-                
-                foreach(var user in users)
+                else
                 {
-                    Console.WriteLine(user);
-                }
-            }
-
-            if(options.GetDisabledUsers)
-            {
-                Console.WriteLine("Inside of getdisabledusers");
-                List<UserPrincipalEx> disabledUsers = domain.GetDisabledUsers();
-                
-                foreach(var user in disabledUsers)
-                {
-                    Console.WriteLine(user);
-                }
+                    Console.WriteLine("Get enabled users only.");
+                }*/
             }
             
-            if(temp != null)
-            {
-                foreach(var t in temp)
-                {
-                    Console.WriteLine("I am looping!");
-                    Console.WriteLine(t);
-                }
-            }
         }
     }
 
@@ -96,5 +72,6 @@ namespace ADCmd
         public bool GetContractors { get; set; }
         public bool GetDisabledUsers { get; set; }
         public bool GetDefaultOU { get; set; }
+        public bool ExportUsers { get; set; }
     }
 }
