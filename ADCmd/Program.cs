@@ -25,11 +25,10 @@ namespace ADCmd
                 {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true}
             }.Parse(args);
             
-            //List<string> temp = p.Parse(args);
-            
             if(!String.IsNullOrEmpty(options.OU))
             {
-                //Console.WriteLine("OU: " + options.OU);
+                // This is a bit of a hack to get the proper format for the 
+                // OU DN, this will get fixed (see issue #5).
                 string ou = options.OU.Substring(1, options.OU.Length - 1);
                 Console.WriteLine("OU: " + ou);
                 bool exportUsers = options.ExportUsers;
@@ -39,26 +38,7 @@ namespace ADCmd
                 {
                     Console.WriteLine(u);
                 }
-
-                /*if(options.ExportUsers)
-                {
-                    Console.WriteLine("This will be epxorted");
-                }
-                else
-                {
-                    Console.WriteLine("This will not be exported");
-                }
-
-                if(options.GetDisabledUsers)
-                {
-                    Console.WriteLine("Get disabled users too");
-                }
-                else
-                {
-                    Console.WriteLine("Get enabled users only.");
-                }*/
             }
-            
         }
     }
 
