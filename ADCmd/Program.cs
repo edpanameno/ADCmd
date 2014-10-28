@@ -19,6 +19,7 @@ namespace ADCmd
             var p = new OptionSet()
             {
                 {"ou|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
+                {"dou|defaultOU=", "Get Users from the Organization Unit", a => options.GetDefaultOU = true},
                 {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true },
                 {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true}
             };
@@ -47,6 +48,16 @@ namespace ADCmd
             {
                 List<UserPrincipalEx> users = domain.GetAllContractors();
 
+                foreach(var user in users)
+                {
+                    Console.WriteLine(user);
+                }
+            }
+
+            if(options.GetDefaultOU)
+            {
+                List<UserPrincipalEx> users = domain.GetUsersFromOU(domain.DefaultOU);
+                
                 foreach(var user in users)
                 {
                     Console.WriteLine(user);
@@ -84,5 +95,7 @@ namespace ADCmd
         public string OU { get; set; }
         public bool GetContractors { get; set; }
         public bool GetDisabledUsers { get; set; }
+        public bool GetDefaultOU { get; set; 
+}
     }
 }

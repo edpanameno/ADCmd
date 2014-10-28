@@ -29,14 +29,14 @@ namespace ADCmd
         public string LDAPPath { get; set; }
         public string ServiceUser { get; set; }
         public string ServicePassword { get; set; }
-        public string ContractorsOU { get; set; }
+        public string DefaultOU { get; set; }
 
         public ADDomain()
         {
             LDAPPath =  ConfigurationManager.AppSettings["ldap_path"];
             ServerName = ConfigurationManager.AppSettings["server_name"];
             Container = ConfigurationManager.AppSettings["container"];
-            ContractorsOU = ConfigurationManager.AppSettings["contractors-ou"];
+            DefaultOU = ConfigurationManager.AppSettings["default-ou"];
             ServiceUser = ConfigurationManager.AppSettings["service_user"];
             ServicePassword = ConfigurationManager.AppSettings["service_password"];
         }
@@ -46,7 +46,7 @@ namespace ADCmd
             List<UserPrincipalEx> activeUsers = new List<UserPrincipalEx>();
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
                                                             ServerName, 
-                                                            ContractorsOU, 
+                                                            DefaultOU, 
                                                             ContextOptions.Negotiate, 
                                                             ServiceUser, 
                                                             ServicePassword);
@@ -124,10 +124,7 @@ namespace ADCmd
                                                             ServiceUser, 
                                                             ServicePassword);
 
-            UserPrincipalEx userFilter = new UserPrincipalEx(context)
-            {
-                Department = "*Pasa*"
-            };
+            UserPrincipalEx userFilter = new UserPrincipalEx(context);
 
             using(PrincipalSearcher searcher = new PrincipalSearcher(userFilter))
             {
