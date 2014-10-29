@@ -34,7 +34,7 @@ namespace ADCmd
             {
                 // Because no OU was passed, we are going to retrieve the list of users from
                 // the default OU
-                users = domain.GetUsersFromOU(domain.DefaultOU, exportUsers);
+                users = domain.GetUsersFromOU(domain.DefaultOU, disabledUsers);
 
                 foreach(var u in users)
                 {
@@ -43,7 +43,7 @@ namespace ADCmd
             }
             else
             {
-                users = domain.GetUsersFromOU(options.OU, exportUsers);
+                users = domain.GetUsersFromOU(options.OU, disabledUsers);
                 foreach(var u in users)
                 {
                     Console.WriteLine(u);
@@ -61,7 +61,6 @@ namespace ADCmd
         public string OU { get; set; }
         public bool GetContractors { get; set; }
         public bool GetDisabledUsers { get; set; }
-        //public bool GetDefaultOU { get; set; }
         public bool ExportUsers { get; set; }
     }
 }

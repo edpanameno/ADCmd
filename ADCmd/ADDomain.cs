@@ -123,7 +123,7 @@ namespace ADCmd
         /// </summary>
         /// <param name="ou"></param>
         /// <returns></returns>
-        public List<UserPrincipalEx> GetUsersFromOU(string ouDN, bool enabledUsers = true)
+        public List<UserPrincipalEx> GetUsersFromOU(string ouDN, bool disabledUsers = false)
         {
             List<UserPrincipalEx> users = new List<UserPrincipalEx>();
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
@@ -135,7 +135,11 @@ namespace ADCmd
 
 
             UserPrincipalEx userFilter = new UserPrincipalEx(context);
-            //userFilter.Enabled = enabledUsers;
+
+            if(disabledUsers)
+            {
+                userFilter.Enabled = false;
+            }
 
             using(PrincipalSearcher searcher = new PrincipalSearcher())
             {
