@@ -15,11 +15,12 @@ namespace ADCmd
         {
             ADDomain domain = new ADDomain();
             var options = new ProgramOptions();
+            List<UserPrincipalEx> users = null;
+            bool exportUsers = false;
 
             var p = new OptionSet()
             {
                 {"o|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
-                {"dou|defaultOU=", "Get Users from the Organization Unit", a => options.GetDefaultOU = true},
                 {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true },
                 {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true},
                 {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true}
@@ -27,13 +28,21 @@ namespace ADCmd
             
             if(!String.IsNullOrEmpty(options.OU))
             {
-                // This is a bit of a hack to get the proper format for the 
-                // OU DN, this will get fixed (see issue #5).
-                string ou = options.OU.Substring(1, options.OU.Length - 1);
-                Console.WriteLine("OU: " + ou);
-                bool exportUsers = options.ExportUsers;
-                List<UserPrincipalEx> users = domain.GetUsersFromOU(ou, exportUsers);
+                exportUsers = options.ExportUsers;
+                users = domain.GetUsersFromOU(options.OU, exportUsers);
 
+                foreach(var u in users)
+                {
+                    Console.WriteLine(u);
+                }
+            }
+            else
+            {
+                // We are assuming that the user wants to get data from
+                // the default ou.
+                exportUsers = options.ExportUsers;
+                users = domain.GetUsersFromOU(domain.DefaultOU, exportUsers);
+                
                 foreach(var u in users)
                 {
                     Console.WriteLine(u);
@@ -51,7 +60,7 @@ namespace ADCmd
         public string OU { get; set; }
         public bool GetContractors { get; set; }
         public bool GetDisabledUsers { get; set; }
-        public bool GetDefaultOU { get; set; }
+        //public bool GetDefaultOU { get; set; }
         public bool ExportUsers { get; set; }
     }
 }
