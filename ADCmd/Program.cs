@@ -17,6 +17,7 @@ namespace ADCmd
             var options = new ProgramOptions();
             List<UserPrincipalEx> users = null;
             bool exportUsers = false;
+            bool disabledUsers = false;
 
             var p = new OptionSet()
             {
@@ -25,11 +26,15 @@ namespace ADCmd
                 {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true},
                 {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true}
             }.Parse(args);
+             
+            exportUsers = options.ExportUsers;
+            disabledUsers = options.GetDisabledUsers;
             
-            if(!String.IsNullOrEmpty(options.OU))
+            if(String.IsNullOrEmpty(options.OU))
             {
-                exportUsers = options.ExportUsers;
-                users = domain.GetUsersFromOU(options.OU, exportUsers);
+                // Because no OU was passed, we are going to retrieve the list of users from
+                // the default OU
+                users = domain.GetUsersFromOU(domain.DefaultOU, exportUsers);
 
                 foreach(var u in users)
                 {
@@ -38,11 +43,7 @@ namespace ADCmd
             }
             else
             {
-                // We are assuming that the user wants to get data from
-                // the default ou.
-                exportUsers = options.ExportUsers;
-                users = domain.GetUsersFromOU(domain.DefaultOU, exportUsers);
-                
+                users = domain.GetUsersFromOU(options.OU, exportUsers);
                 foreach(var u in users)
                 {
                     Console.WriteLine(u);

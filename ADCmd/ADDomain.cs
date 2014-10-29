@@ -125,8 +125,6 @@ namespace ADCmd
         /// <returns></returns>
         public List<UserPrincipalEx> GetUsersFromOU(string ouDN, bool enabledUsers = true)
         {
-            Console.WriteLine("inside of getusersfom ou (ouDN: {0})", ouDN);
-
             List<UserPrincipalEx> users = new List<UserPrincipalEx>();
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
                                                             ServerName, 
