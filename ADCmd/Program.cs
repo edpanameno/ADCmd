@@ -15,7 +15,7 @@ namespace ADCmd
         {
             ADDomain domain = new ADDomain();
             var options = new ProgramOptions();
-            List<UserPrincipalEx> users = null;
+            List<ADUser> users = null;
             bool exportUsers = false;
             bool disabledUsers = false;
 

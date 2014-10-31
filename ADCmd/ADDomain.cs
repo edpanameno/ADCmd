@@ -32,6 +32,7 @@ namespace ADCmd
         public string DefaultOU { get; set; }
         public string TempUsersOU { get; set; }
         public string DomainSuffix { get; set; }
+        public string DisabledOU { get; set; }
 
         public ADDomain()
         {
@@ -43,6 +44,7 @@ namespace ADCmd
             ServicePassword = ConfigurationManager.AppSettings["service_password"];
             TempUsersOU = ConfigurationManager.AppSettings["temp-users"];
             DomainSuffix = ConfigurationManager.AppSettings["domain-suffix"];
+            DisabledOU = ConfigurationManager.AppSettings["disabled-ou"];
         }
 
         /// <summary>
@@ -50,9 +52,9 @@ namespace ADCmd
         /// as the default OU in the app.config file.
         /// </summary>
         /// <returns></returns>
-        public List<UserPrincipalEx> GetUsersFromDefaultOU()
+        public List<ADUser> GetUsersFromDefaultOU()
         {
-            List<UserPrincipalEx> activeUsers = new List<UserPrincipalEx>();
+            List<ADUser> activeUsers = new List<ADUser>();
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
                                                             ServerName, 
                                                             DefaultOU, 
@@ -62,7 +64,7 @@ namespace ADCmd
 
             // We are only interested in searching for active directory 
             // accounts that are enabled.
-            UserPrincipalEx userFilter = new UserPrincipalEx(context)
+            ADUser userFilter = new ADUser(context)
             {
                 Enabled = true 
             };
@@ -76,7 +78,7 @@ namespace ADCmd
                 {
                     // This will allow us to get to the custom attributes that we 
                     // have defined in our custom UserPrincipal object
-                    UserPrincipalEx usr = user as UserPrincipalEx;
+                    ADUser usr = user as ADUser;
                     activeUsers.Add(usr);
                 }
             }
@@ -88,9 +90,9 @@ namespace ADCmd
         /// Gets a list of users who are disabled
         /// </summary>
         /// <returns></returns>
-        public List<UserPrincipalEx> GetDisabledUsers()
+        public List<ADUser> GetDisabledUsers()
         {
-            List<UserPrincipalEx> activeUsers = new List<UserPrincipalEx>();
+            List<ADUser> activeUsers = new List<ADUser>();
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
                                                             ServerName, 
                                                             Container, 
@@ -100,7 +102,7 @@ namespace ADCmd
 
             // We are only interested in searching for active directory 
             // accounts that are disabled.
-            UserPrincipalEx userFilter = new UserPrincipalEx(context)
+            ADUser userFilter = new ADUser(context)
             {
                 Enabled = false 
             };
@@ -114,7 +116,7 @@ namespace ADCmd
                 {
                     // This will allow us to get to the custom attributes that we 
                     // have defined in our custom UserPrincipal object
-                    UserPrincipalEx usr = user as UserPrincipalEx;
+                    ADUser usr = user as ADUser;
                     activeUsers.Add(usr);
                 }
             }
@@ -128,9 +130,9 @@ namespace ADCmd
         /// <param name="ouDN">The Distinguished DN of the OU to get users from</param>
         /// <param name="getDisabledUsers">Boolean value used to check if you want to get disabled users or not.</param>
         /// <returns></returns>
-        public List<UserPrincipalEx> GetUsersFromOU(string ouDN, bool getDisabledUsers)
+        public List<ADUser> GetUsersFromOU(string ouDN, bool getDisabledUsers)
         {
-            List<UserPrincipalEx> users = new List<UserPrincipalEx>();
+            List<ADUser> users = new List<ADUser>();
 
             // The PrincipalContext object is used to establish a connection to the
             // target directory and specify the credentials for performing
@@ -146,7 +148,7 @@ namespace ADCmd
                                                             ServicePassword);
 
 
-            UserPrincipalEx userFilter = new UserPrincipalEx(context);
+            ADUser userFilter = new ADUser(context);
 
             if(!getDisabledUsers)
             {
@@ -163,7 +165,7 @@ namespace ADCmd
                 {
                     // This will allow us to get to the custom attributes that we 
                     // have defined in our custom UserPrincipal object
-                    UserPrincipalEx usr = user as UserPrincipalEx;
+                    ADUser usr = user as ADUser;
                     users.Add(usr);
                 }
             }
@@ -183,7 +185,7 @@ namespace ADCmd
                                                             ServiceUser, 
                                                             ServicePassword);
 
-            UserPrincipalEx newUser = new UserPrincipalEx(context);
+            ADUser newUser = new ADUser(context);
             Console.Write("First Name: ");
             newUser.GivenName = Console.ReadLine();
             Console.Write("Last Name: ");
@@ -218,7 +220,7 @@ namespace ADCmd
                                                             ServicePassword);
 
 
-            using(UserPrincipalEx user = UserPrincipalEx.FindByIdentity(context, userName))
+            using(ADUser user = ADUser.FindByIdentity(context, userName))
             {
                 if(user != null)
                 {
@@ -251,7 +253,7 @@ namespace ADCmd
                                                             ServiceUser, 
                                                             ServicePassword);
 
-            using(UserPrincipalEx user = UserPrincipalEx.FindByIdentity(context, userName))
+            using(ADUser user = ADUser.FindByIdentity(context, userName))
             {
                 if(user != null)
                 {

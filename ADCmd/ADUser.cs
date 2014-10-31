@@ -9,9 +9,9 @@ namespace ADCmd
 {
     [DirectoryObjectClass("user")]
     [DirectoryRdnPrefix("CN")]
-    public class UserPrincipalEx : UserPrincipal
+    public class ADUser : UserPrincipal
     {
-        public UserPrincipalEx(PrincipalContext context) : base(context) {}
+        public ADUser(PrincipalContext context) : base(context) {}
 
         [DirectoryProperty("company")]
         public string Company
@@ -130,14 +130,14 @@ namespace ADCmd
 
         // The new keyword here hides the static method FindByIdentity of 
         // the UserPrincipal class.
-        public static new UserPrincipalEx FindByIdentity(PrincipalContext context, string identityValue)
+        public static new ADUser FindByIdentity(PrincipalContext context, string identityValue)
         {
-            return (UserPrincipalEx)FindByIdentityWithType(context, typeof(UserPrincipalEx), identityValue);
+            return (ADUser)FindByIdentityWithType(context, typeof(ADUser), identityValue);
         }
 
-        public static new UserPrincipalEx FindByIdentity(PrincipalContext context, IdentityType identityType, string identityValue)
+        public static new ADUser FindByIdentity(PrincipalContext context, IdentityType identityType, string identityValue)
         {
-            return (UserPrincipalEx)FindByIdentityWithType(context, typeof(UserPrincipalEx), identityType, identityValue);
+            return (ADUser)FindByIdentityWithType(context, typeof(ADUser), identityType, identityValue);
         }
     }
 }
