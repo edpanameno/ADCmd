@@ -194,7 +194,7 @@ namespace ADCmd
             string password = Console.ReadLine();
             newUser.SetPassword(password);
 
-            newUser.Description = "Account being created by the ADCmd utility on " + DateTime.Now.ToString();
+            newUser.Notes = "Account being created by the ADCmd utility on " + DateTime.Now.ToString();
 
             newUser.UserPrincipalName = newUser.SamAccountName + DomainSuffix;
             newUser.Enabled = true;

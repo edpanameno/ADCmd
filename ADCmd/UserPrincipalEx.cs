@@ -97,6 +97,27 @@ namespace ADCmd
             }
         }
 
+        [DirectoryProperty("info")]
+        public string Notes
+        {
+            get
+            {
+                if(ExtensionGet("info").Length != 1)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    return (string)ExtensionGet("info")[0];
+                }
+            }
+
+            set
+            {
+                ExtensionSet("info", value);
+            }
+        }
+
         public override string ToString()
         {
             return "Username: " + this.SamAccountName + "\n" +
