@@ -121,11 +121,19 @@ namespace ADCmd
         /// <summary>
         /// Gets all of the users from the specified OU. The ou va
         /// </summary>
-        /// <param name="ou"></param>
+        /// <param name="ouDN">The Distinguished DN of the OU to get users from</param>
+        /// <param name="getDisabledUsers">Boolean value used to check if you want to get disabled users or not.</param>
         /// <returns></returns>
-        public List<UserPrincipalEx> GetUsersFromOU(string ouDN, bool disabledUsers = false)
+        public List<UserPrincipalEx> GetUsersFromOU(string ouDN, bool getDisabledUsers)
         {
             List<UserPrincipalEx> users = new List<UserPrincipalEx>();
+
+            // The PrincipalContext object is used to establish a connection to the
+            // target directory and specify the credentials for performing
+            // operations against the directory. In the example below, we are 
+            // connecting to a Active Directory Domain.
+            // The ServerName parameter that you see below can be either a server name
+            // (i.e. domain controller) or domain name to connect to.
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
                                                             ServerName, 
                                                             ouDN, 
@@ -136,7 +144,7 @@ namespace ADCmd
 
             UserPrincipalEx userFilter = new UserPrincipalEx(context);
 
-            if(disabledUsers)
+            if(!getDisabledUsers)
             {
                 userFilter.Enabled = false;
             }
