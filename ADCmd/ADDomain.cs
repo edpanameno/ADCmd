@@ -231,7 +231,7 @@ namespace ADCmd
                 }
                 else
                 {
-                    Console.WriteLine("The username `{0}` was not found in the directory", userName);
+                    Console.WriteLine("The username '{0}' was not found in the directory", userName);
                 }
             }
 
@@ -255,7 +255,12 @@ namespace ADCmd
             {
                 if(user != null)
                 {
-                    Console.WriteLine("container: " + user.Context.Container);
+                    // We are appending notes to the user object because we
+                    // don't want to delete any existing notes that may exist
+                    // in the user object already. A new line character is also 
+                    // placed at the end of the note so that it's easy to see
+                    // the different notes that have been entered for on the 
+                    // user's account.
                     user.Notes += notes + Environment.NewLine;
                     user.Save();
                 }
@@ -264,6 +269,16 @@ namespace ADCmd
                     Console.WriteLine("User '{0}' was not found in the directory", userName);
                 }
             }
+        }
+
+        /// <summary>
+        /// Disables a user account in the directory and also removes the user
+        /// from all but two groups and adds a note to the user's account as to
+        /// when this account was disabled.
+        /// </summary>
+        /// <param name="useraName"></param>
+        public void DisableUser(string useraName)
+        {
         }
 
         /// <summary>
