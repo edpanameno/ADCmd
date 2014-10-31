@@ -30,6 +30,8 @@ namespace ADCmd
         public string ServiceUser { get; set; }
         public string ServicePassword { get; set; }
         public string DefaultOU { get; set; }
+        public string TempUsersOU { get; set; }
+        public string DomainSuffix { get; set; }
 
         public ADDomain()
         {
@@ -39,6 +41,8 @@ namespace ADCmd
             DefaultOU = ConfigurationManager.AppSettings["default-ou"];
             ServiceUser = ConfigurationManager.AppSettings["service_user"];
             ServicePassword = ConfigurationManager.AppSettings["service_password"];
+            TempUsersOU = ConfigurationManager.AppSettings["temp-users"];
+            DomainSuffix = ConfigurationManager.AppSettings["domain-suffix"];
         }
 
         /// <summary>
@@ -165,6 +169,36 @@ namespace ADCmd
             }
 
             return users.OrderBy(u => u.Surname).ToList();
+        }
+
+        public void CreateUser()
+        {
+            // Note: we are using the Temp-Users ou as the container where the
+            // user will be created in. The username that is used to connect to 
+            // the domain will need to be able to create accounts in the domain.
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
+                                                            ServerName, 
+                                                            TempUsersOU, 
+                                                            ContextOptions.Negotiate, 
+                                                            ServiceUser, 
+                                                            ServicePassword);
+
+            UserPrincipalEx newUser = new UserPrincipalEx(context);
+            Console.Write("First Name: ");
+            newUser.GivenName = Console.ReadLine();
+            Console.Write("Last Name: ");
+            newUser.Surname = Console.ReadLine();
+            Console.Write("Username: ");
+            newUser.SamAccountName = Console.ReadLine();
+            Console.Write("Password: ");
+            string password = Console.ReadLine();
+            newUser.SetPassword(password);
+
+            newUser.Description = "Account being created by the ADCmd utility on " + DateTime.Now.ToString();
+
+            newUser.UserPrincipalName = newUser.SamAccountName + DomainSuffix;
+            newUser.Enabled = true;
+            newUser.Save();
         }
 
         /// <summary>

@@ -24,11 +24,20 @@ namespace ADCmd
                 {"o|organizationalUnit=", "Organizational Unit that holds the users", a => options.OU = a},
                 {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true },
                 {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true},
-                {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true}
+                {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true},
+                {"cu|createUser", "Create User", a => options.CreateUser = true}
             }.Parse(args);
              
             exportUsers = options.ExportUsers;
             disabledUsers = options.GetDisabledUsers;
+
+            if(options.CreateUser)
+            {
+                Console.WriteLine("Creating new user");
+                domain.CreateUser();
+
+                return;
+            }
             
             if(String.IsNullOrEmpty(options.OU))
             {
@@ -40,8 +49,10 @@ namespace ADCmd
                 {
                     Console.WriteLine(u);
                 }
+
+                return;
             }
-            else
+            else 
             {
                 users = domain.GetUsersFromOU(options.OU, disabledUsers);
                 foreach(var u in users)
@@ -62,5 +73,6 @@ namespace ADCmd
         public bool GetContractors { get; set; }
         public bool GetDisabledUsers { get; set; }
         public bool ExportUsers { get; set; }
+        public bool CreateUser { get; set; }
     }
 }
