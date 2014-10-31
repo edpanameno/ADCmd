@@ -222,9 +222,6 @@ namespace ADCmd
             {
                 if(user != null)
                 {
-                    user.Notes = "*ADCmd";
-                    Console.WriteLine("Container: " + user.Context.Container);
-
                     // Get groups that the user belongs to now
                     PrincipalSearchResult<Principal> results = user.GetAuthorizationGroups();
                     foreach(var result in results)
@@ -240,6 +237,11 @@ namespace ADCmd
 
         }
 
+        /// <summary>
+        /// Allows you to add notes to the specified user name
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="notes"></param>
         public void UpdateUserNotes(string userName, string notes)
         {
             PrincipalContext context = new PrincipalContext(ContextType.Domain, 
@@ -249,6 +251,19 @@ namespace ADCmd
                                                             ServiceUser, 
                                                             ServicePassword);
 
+            using(UserPrincipalEx user = UserPrincipalEx.FindByIdentity(context, userName))
+            {
+                if(user != null)
+                {
+                    Console.WriteLine("container: " + user.Context.Container);
+                    user.Notes += notes + Environment.NewLine;
+                    user.Save();
+                }
+                else
+                {
+                    Console.WriteLine("User '{0}' was not found in the directory", userName);
+                }
+            }
         }
 
         /// <summary>
