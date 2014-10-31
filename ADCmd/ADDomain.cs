@@ -205,10 +205,6 @@ namespace ADCmd
 
         public void AddUsertoGroup(string userName, string groupName)
         {
-            /*Console.Write("Enter Container: ");
-            string localContainer = Console.ReadLine();
-            Console.WriteLine("value of localContainer: {0}", localContainer);*/
-
             // First we have to create a context that will look for the user
             // and the group that we are looking. Notice that for the container
             // we have used null, this means that this will use the defaultNamingContext.
@@ -279,8 +275,46 @@ namespace ADCmd
         /// when this account was disabled.
         /// </summary>
         /// <param name="useraName"></param>
-        public void DisableUser(string useraName)
+        public void DisableUser(string userName)
         {
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
+                                                            ServerName, 
+                                                            null, 
+                                                            ContextOptions.Negotiate, 
+                                                            ServiceUser, 
+                                                            ServicePassword);
+            
+            using(ADUser user = ADUser.FindByIdentity(context, userName))
+            {
+                if(user != null)
+                {
+                    Console.WriteLine("Status of user {0} is ou {1}", userName, user.Context.Container);
+                    if(user.Enabled == false && user.Context.Container == DisabledOU)
+                    {
+                        return;
+                    }
+
+                    user.Enabled = false;
+                    user.Notes += "User Disabled on " + DateTime.Now.ToString() + Environment.NewLine;
+                    
+                    // We now have to create a new PrincipcalContext object that is used
+                    // to move the user account to the Disabled OU in the domain. This is 
+                    // then used in the overloaded Save(PrincipalContext) method below to 
+                    // update the location of this user object.
+                    PrincipalContext newOU = new PrincipalContext(ContextType.Domain, 
+                                                                  ServerName, 
+                                                                  DisabledOU, 
+                                                                  ContextOptions.Negotiate, 
+                                                                  ServiceUser, 
+                                                                  ServicePassword);
+                    user.Save(newOU);
+                }
+                else
+                {
+                    Console.WriteLine("The username '{0}' was not found in the directory", userName);
+                }
+            }
+
         }
 
         /// <summary>

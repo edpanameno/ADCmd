@@ -27,8 +27,19 @@ namespace ADCmd
                 {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true},
                 {"cu|createUser", "Create User", a => options.CreateUser = true},
                 {"ag|addUserToGroup", "Add user to group", a => options.AddUsertoGroup = true},
-                {"un|updateNotes", "Update the notes on a user", a => options.UpdateNotes = true}
+                {"un|updateNotes", "Update the notes on a user", a => options.UpdateNotes = true},
+                {"du|disableUser", "Disable user", a => options.DisableUser = true},
             }.Parse(args);
+
+            if(options.DisableUser)
+            {
+                Console.WriteLine("Inside of disabling user");
+                Console.Write("Username to disable: ");
+                string userID = Console.ReadLine();
+                domain.DisableUser(userID);
+                
+                return;
+            }
 
             if(options.UpdateNotes)
             {
@@ -97,5 +108,6 @@ namespace ADCmd
         public bool CreateUser { get; set; }
         public bool AddUsertoGroup { get; set; }
         public bool UpdateNotes { get; set; }
+        public bool DisableUser { get; set; }
     }
 }
