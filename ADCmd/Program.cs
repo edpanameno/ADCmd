@@ -25,11 +25,22 @@ namespace ADCmd
                 {"c|contractors=", "Get contractors from default OU", a => options.GetContractors = true },
                 {"d|disabledUsers", "Get users who are disabled", a => options.GetDisabledUsers = true},
                 {"e|exportUsers", "Export Users to Excel File", a => options.ExportUsers = true},
-                {"cu|createUser", "Create User", a => options.CreateUser = true}
+                {"cu|createUser", "Create User", a => options.CreateUser = true},
+                {"ag|addUserToGroup", "Add user to group", a => options.AddUsertoGroup = true}
             }.Parse(args);
              
             exportUsers = options.ExportUsers;
             disabledUsers = options.GetDisabledUsers;
+
+            if(options.AddUsertoGroup)
+            {
+                Console.WriteLine("Adding user to group");
+                Console.Write("Enter username: ");
+                string userName = Console.ReadLine();
+                domain.AddUsertoGroup(userName, null);
+                
+                return;
+            }
 
             if(options.CreateUser)
             {
@@ -74,5 +85,6 @@ namespace ADCmd
         public bool GetDisabledUsers { get; set; }
         public bool ExportUsers { get; set; }
         public bool CreateUser { get; set; }
+        public bool AddUsertoGroup { get; set; }
     }
 }

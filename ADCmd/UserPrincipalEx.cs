@@ -126,5 +126,18 @@ namespace ADCmd
                    "Department: " + this.Department + "\n" +
                    "Telephone: " + this.PhoneNumber + "\n" +
                    "Company: " + this.Company + "\n";
-        }    }
+        }
+
+        // The new keyword here hides the static method FindByIdentity of 
+        // the UserPrincipal class.
+        public static new UserPrincipalEx FindByIdentity(PrincipalContext context, string identityValue)
+        {
+            return (UserPrincipalEx)FindByIdentityWithType(context, typeof(UserPrincipalEx), identityValue);
+        }
+
+        public static new UserPrincipalEx FindByIdentity(PrincipalContext context, IdentityType identityType, string identityValue)
+        {
+            return (UserPrincipalEx)FindByIdentityWithType(context, typeof(UserPrincipalEx), identityType, identityValue);
+        }
+    }
 }

@@ -201,6 +201,56 @@ namespace ADCmd
             newUser.Save();
         }
 
+        public void AddUsertoGroup(string userName, string groupName)
+        {
+            /*Console.Write("Enter Container: ");
+            string localContainer = Console.ReadLine();
+            Console.WriteLine("value of localContainer: {0}", localContainer);*/
+
+            // First we have to create a context that will look for the user
+            // and the group that we are looking. Notice that for the container
+            // we have used null, this means that this will use the defaultNamingContext.
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
+                                                            ServerName, 
+                                                            null, 
+                                                            ContextOptions.Negotiate, 
+                                                            ServiceUser, 
+                                                            ServicePassword);
+
+
+            using(UserPrincipalEx user = UserPrincipalEx.FindByIdentity(context, userName))
+            {
+                if(user != null)
+                {
+                    user.Notes = "*ADCmd";
+                    Console.WriteLine("Container: " + user.Context.Container);
+
+                    // Get groups that the user belongs to now
+                    PrincipalSearchResult<Principal> results = user.GetAuthorizationGroups();
+                    foreach(var result in results)
+                    {
+                        Console.WriteLine("Group Name: {0}", result.Name);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("The username `{0}` was not found in the directory", userName);
+                }
+            }
+
+        }
+
+        public void UpdateUserNotes(string userName, string notes)
+        {
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
+                                                            ServerName, 
+                                                            null, 
+                                                            ContextOptions.Negotiate, 
+                                                            ServiceUser, 
+                                                            ServicePassword);
+
+        }
+
         /// <summary>
         /// Checks to see if the OU DN is a valid one.
         /// </summary>
