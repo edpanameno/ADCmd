@@ -34,6 +34,12 @@ namespace ADCmd
         public string DomainSuffix { get; set; }
         public string DisabledOU { get; set; }
 
+        /// <summary>
+        ///  Keeps track of the group names that we want all users
+        ///  to have after they have been disabled
+        /// </summary>
+        public string GroupsToKeep { get; set; }
+
         public ADDomain()
         {
             LDAPPath =  ConfigurationManager.AppSettings["ldap_path"];
@@ -45,6 +51,7 @@ namespace ADCmd
             TempUsersOU = ConfigurationManager.AppSettings["temp-users"];
             DomainSuffix = ConfigurationManager.AppSettings["domain-suffix"];
             DisabledOU = ConfigurationManager.AppSettings["disabled-ou"];
+            GroupsToKeep = ConfigurationManager.AppSettings["groups-to-keep"];
         }
 
         /// <summary>
@@ -288,12 +295,16 @@ namespace ADCmd
             {
                 if(user != null)
                 {
-                    Console.WriteLine("Status of user {0} is ou {1}", userName, user.Context.Container);
-                    if(user.Enabled == false && user.Context.Container == DisabledOU)
+                    if(user.Enabled == false)
                     {
+                        Console.WriteLine("The account '{0}' is already disabled", userName);
+                        Console.Write("Notes: {0}", user.Notes);
+                        
                         return;
                     }
 
+                    RemoveUserGroups(user);
+                    
                     user.Enabled = false;
                     user.Notes += "User Disabled on " + DateTime.Now.ToString() + Environment.NewLine;
                     
@@ -301,13 +312,14 @@ namespace ADCmd
                     // to move the user account to the Disabled OU in the domain. This is 
                     // then used in the overloaded Save(PrincipalContext) method below to 
                     // update the location of this user object.
-                    PrincipalContext newOU = new PrincipalContext(ContextType.Domain, 
-                                                                  ServerName, 
-                                                                  DisabledOU, 
-                                                                  ContextOptions.Negotiate, 
-                                                                  ServiceUser, 
-                                                                  ServicePassword);
-                    user.Save(newOU);
+                    PrincipalContext disabledOU = new PrincipalContext(ContextType.Domain, 
+                                                                       ServerName, 
+                                                                       DisabledOU, 
+                                                                       ContextOptions.Negotiate, 
+                                                                       ServiceUser, 
+                                                                       ServicePassword);
+                    user.Save(disabledOU);
+
                 }
                 else
                 {
@@ -315,6 +327,23 @@ namespace ADCmd
                 }
             }
 
+        }
+
+        /// <summary>
+        /// Removes the user from all of the groups except for those that have
+        /// been specified in the app.config file. This meets a requirement that
+        /// all users who are disabled have the two specified groups left in their
+        /// profile.
+        /// </summary>
+        /// <param name="user"></param>
+        private void RemoveUserGroups(ADUser user)
+        {
+            List<string> groupsToKeep = GroupsToKeep.Split(';').ToList();
+
+            foreach(var group in user.GetGroups())
+            {
+                Console.WriteLine("{0} is part of the group: {1} - {2}: Remove {3}", user.SamAccountName, group.Name, group.DistinguishedName, groupsToKeep.Contains(group.Name));
+            }
         }
 
         /// <summary>
