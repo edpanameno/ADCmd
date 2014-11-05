@@ -356,7 +356,7 @@ namespace ADCmd
                                 // For the purposes of this application, I am keeping track of what
                                 // group the user was removed from by appending the following line to
                                 // each group that is successfully removed. This is something that would
-                                // normally be logged to a Dabase or other persistent data store.
+                                // normally be logged to a Database or other persistent data store.
                                 user.Notes += "Removed from group: " + group.Name + Environment.NewLine;
                             }
                         }
@@ -367,6 +367,15 @@ namespace ADCmd
             {
                 Console.WriteLine("Unable to remove User {0} from group: {1}", user.SamAccountName, e.ToString());
             }
+        }
+
+        /// <summary>
+        /// Gets a list of users that belong to the specified group.
+        /// </summary>
+        /// <param name="groupName"></param>
+        public void GetGroupMembers(string groupName)
+        {
+
         }
 
         /// <summary>

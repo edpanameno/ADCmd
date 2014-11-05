@@ -16,8 +16,6 @@ namespace ADCmd
             ADDomain domain = new ADDomain();
             var options = new ProgramOptions();
             List<ADUser> users = null;
-            bool exportUsers = false;
-            bool disabledUsers = false;
 
             var p = new OptionSet()
             {
@@ -29,7 +27,18 @@ namespace ADCmd
                 {"ag|addUserToGroup", "Add user to group", a => options.AddUsertoGroup = true},
                 {"un|updateNotes", "Update the notes on a user", a => options.UpdateNotes = true},
                 {"du|disableUser", "Disable user", a => options.DisableUser = true},
+                {"gm|groupMembers", "Get members of a group", a => options.GroupMembers = true}
             }.Parse(args);
+
+            if(options.GroupMembers)
+            {
+                Console.WriteLine("Inside of Groupmembers");
+                Console.Write("Enter Group Name: ");
+                string groupName = Console.ReadLine();
+                domain.GetGroupMembers(groupName);
+                
+                return;
+            }
 
             if(options.DisableUser)
             {
@@ -109,5 +118,6 @@ namespace ADCmd
         public bool AddUsertoGroup { get; set; }
         public bool UpdateNotes { get; set; }
         public bool DisableUser { get; set; }
+        public bool GroupMembers { get; set; }
     }
 }
