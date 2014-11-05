@@ -185,29 +185,36 @@ namespace ADCmd
             // Note: we are using the Temp-Users ou as the container where the
             // user will be created in. The username that is used to connect to 
             // the domain will need to be able to create accounts in the domain.
-            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
-                                                            ServerName, 
-                                                            TempUsersOU, 
-                                                            ContextOptions.Negotiate, 
-                                                            ServiceUser, 
-                                                            ServicePassword);
+            using(PrincipalContext context = new PrincipalContext(ContextType.Domain, ServerName, TempUsersOU, ContextOptions.Negotiate, ServiceUser, ServicePassword))
+            {
+                try
+                {
+                    using(ADUser newUser = new ADUser(context))
+                    {
+                        Console.Write("First Name: ");
+                        newUser.GivenName = Console.ReadLine();
+                        Console.Write("Last Name: ");
+                        newUser.Surname = Console.ReadLine();
+                        Console.Write("Username: ");
+                        newUser.SamAccountName = Console.ReadLine();
+                        Console.Write("Password: ");
+                        string password = Console.ReadLine();
+                        newUser.SetPassword(password);
 
-            ADUser newUser = new ADUser(context);
-            Console.Write("First Name: ");
-            newUser.GivenName = Console.ReadLine();
-            Console.Write("Last Name: ");
-            newUser.Surname = Console.ReadLine();
-            Console.Write("Username: ");
-            newUser.SamAccountName = Console.ReadLine();
-            Console.Write("Password: ");
-            string password = Console.ReadLine();
-            newUser.SetPassword(password);
+                        newUser.Notes = "Account being created by the ADCmd utility on " + DateTime.Now.ToString();
 
-            newUser.Notes = "Account being created by the ADCmd utility on " + DateTime.Now.ToString();
+                        newUser.UserPrincipalName = newUser.SamAccountName + DomainSuffix;
+                        newUser.Enabled = true;
+                        newUser.Save();
 
-            newUser.UserPrincipalName = newUser.SamAccountName + DomainSuffix;
-            newUser.Enabled = true;
-            newUser.Save();
+                    }
+                
+                }
+                catch(DirectoryServicesCOMException e)
+                {
+                    Console.WriteLine("Error in creating user: {0}", e.ToString());
+                }
+            }
         }
 
         public void AddUsertoGroup(string userName, string groupName)
@@ -284,49 +291,40 @@ namespace ADCmd
         /// <param name="useraName"></param>
         public void DisableUser(string userName)
         {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain, 
-                                                            ServerName, 
-                                                            null, 
-                                                            ContextOptions.Negotiate, 
-                                                            ServiceUser, 
-                                                            ServicePassword);
-            
-            using(ADUser user = ADUser.FindByIdentity(context, userName))
+            using(PrincipalContext context = new PrincipalContext(ContextType.Domain, ServerName, null, ContextOptions.Negotiate, ServiceUser, ServicePassword))
             {
-                if(user != null)
+                using(ADUser user = ADUser.FindByIdentity(context, userName))
                 {
-                    if(user.Enabled == false)
+                    if(user != null)
                     {
-                        Console.WriteLine("The account '{0}' is already disabled", userName);
-                        Console.Write("Notes: {0}", user.Notes);
+                        if(user.Enabled == false)
+                        {
+                            Console.WriteLine("The account '{0}' is already disabled", userName);
+                            Console.Write("Notes: {0}", user.Notes);
+                            
+                            return;
+                        }
+
+                        user.Enabled = false;
+                        user.Notes += "User Disabled on " + DateTime.Now.ToString() + Environment.NewLine;
                         
-                        return;
+                        RemoveUserGroups(user);
+
+                        // We now have to create a new PrincipcalContext object that is used
+                        // to move the user account to the Disabled OU in the domain. This is 
+                        // then used in the overloaded Save(PrincipalContext) method below to 
+                        // update the location of this user object.
+                        using(PrincipalContext disabledOU = new PrincipalContext(ContextType.Domain, ServerName, DisabledOU, ContextOptions.Negotiate, ServiceUser, ServicePassword))
+                        {
+                            user.Save(disabledOU);
+                        }
                     }
-
-                    RemoveUserGroups(user);
-                    
-                    user.Enabled = false;
-                    user.Notes += "User Disabled on " + DateTime.Now.ToString() + Environment.NewLine;
-                    
-                    // We now have to create a new PrincipcalContext object that is used
-                    // to move the user account to the Disabled OU in the domain. This is 
-                    // then used in the overloaded Save(PrincipalContext) method below to 
-                    // update the location of this user object.
-                    PrincipalContext disabledOU = new PrincipalContext(ContextType.Domain, 
-                                                                       ServerName, 
-                                                                       DisabledOU, 
-                                                                       ContextOptions.Negotiate, 
-                                                                       ServiceUser, 
-                                                                       ServicePassword);
-                    user.Save(disabledOU);
-
-                }
-                else
-                {
-                    Console.WriteLine("The username '{0}' was not found in the directory", userName);
+                    else
+                    {
+                        Console.WriteLine("The username '{0}' was not found in the directory", userName);
+                    }
                 }
             }
-
         }
 
         /// <summary>
@@ -340,9 +338,34 @@ namespace ADCmd
         {
             List<string> groupsToKeep = GroupsToKeep.Split(';').ToList();
 
-            foreach(var group in user.GetGroups())
+            try
             {
-                Console.WriteLine("{0} is part of the group: {1} - {2}: Remove {3}", user.SamAccountName, group.Name, group.DistinguishedName, groupsToKeep.Contains(group.Name));
+                // TODO: Come back and check to see if setting the container to null
+                // is the best practice.  
+                using(PrincipalContext groupContext = new PrincipalContext(ContextType.Domain, ServerName, null, ContextOptions.Negotiate, ServiceUser, ServicePassword))
+                {
+                    foreach(var grp in user.GetGroups())
+                    {
+                        using(GroupPrincipal group = GroupPrincipal.FindByIdentity(groupContext, grp.Name))
+                        {
+                            if(!groupsToKeep.Contains(group.Name))
+                            {
+                                group.Members.Remove(user); 
+                                group.Save();
+                                
+                                // For the purposes of this application, I am keeping track of what
+                                // group the user was removed from by appending the following line to
+                                // each group that is successfully removed. This is something that would
+                                // normally be logged to a Dabase or other persistent data store.
+                                user.Notes += "Removed from group: " + group.Name + Environment.NewLine;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (DirectoryServicesCOMException e)
+            {
+                Console.WriteLine("Unable to remove User {0} from group: {1}", user.SamAccountName, e.ToString());
             }
         }
 
