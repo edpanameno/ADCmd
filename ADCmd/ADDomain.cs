@@ -33,6 +33,7 @@ namespace ADCmd
         public string TempUsersOU { get; set; }
         public string DomainSuffix { get; set; }
         public string DisabledOU { get; set; }
+        public string Vendors { get; set; }
 
         /// <summary>
         ///  Keeps track of the group names that we want all users
@@ -52,6 +53,7 @@ namespace ADCmd
             DomainSuffix = ConfigurationManager.AppSettings["domain-suffix"];
             DisabledOU = ConfigurationManager.AppSettings["disabled-ou"];
             GroupsToKeep = ConfigurationManager.AppSettings["groups-to-keep"];
+            Vendors = ConfigurationManager.AppSettings["vendors"];
         }
 
         /// <summary>

@@ -5,10 +5,11 @@ using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NDesk.Options;
 
 namespace ADCmd
 {
+    using NDesk.Options;
+
     class Program
     {
         static void Main(string[] args)
@@ -27,8 +28,15 @@ namespace ADCmd
                 {"ag|addUserToGroup", "Add user to group", a => options.AddUsertoGroup = true},
                 {"un|updateNotes", "Update the notes on a user", a => options.UpdateNotes = true},
                 {"du|disableUser", "Disable user", a => options.DisableUser = true},
-                {"gm|groupMembers", "Get members of a group", a => options.GroupMembers = true}
+                {"gm|groupMembers", "Get members of a group", a => options.GroupMembers = true},
+                {"tc|testConnect", "Testing Connection to domain controller", a => options.TestConnect = true }
             }.Parse(args);
+
+            if(options.TestConnect)
+            {
+                Console.WriteLine("Inside of Test Connect");
+                return;
+            }
 
             if(options.GroupMembers)
             {
@@ -119,5 +127,6 @@ namespace ADCmd
         public bool UpdateNotes { get; set; }
         public bool DisableUser { get; set; }
         public bool GroupMembers { get; set; }
+        public bool TestConnect { get; set; }
     }
 }
